@@ -1,0 +1,22 @@
+{
+  "name": "quasar-app-extension-db-table",
+  "version": "0.0.1",
+  "description": "Quasar App Extension which injects a Vue component - DbTable",
+  "author": "Razvan Stoenescu <razvan.stoenescu@gmail.com>",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexdee2007/quasar-app-extension-db-table"
+  },
+  "bugs": "https://github.com/alexdee2007/quasar-app-extension-db-table/issues",
+  "homepage": "https://quasar.dev",
+  "engines": {
+    "node": ">= 8.9.0",
+    "npm": ">= 5.6.0",
+    "yarn": ">= 1.6.0"
+  }
+}
