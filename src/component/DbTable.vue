@@ -207,15 +207,22 @@
 
 <script>
 
+  // global
   import { exportFile } from 'quasar';
   import { find, set } from 'lodash';
   import moment from 'moment';
+
+  // app
   import modelApi from 'src/api/model';
+
+  //internal
+  import fieldsMixin from '../mixins/fields';
   import DbTableSort from '../dialogs/DbTableSort';
   import DbTableFilter from '../dialogs/DbTableFilter';
 
   export default {
     name: 'DbTableData',
+    mixins: [fieldsMixin],
     components: {
       DbTableSort,
       DbTableFilter

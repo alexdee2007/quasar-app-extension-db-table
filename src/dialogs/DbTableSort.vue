@@ -57,13 +57,18 @@
 
 <script>
 
+  // global
   import { find } from 'lodash';
   import { required } from 'vuelidate/lib/validators';
-  import { orderOptions } from 'src/data/operators';
-  import DialogLayout from 'layouts/DialogLayout';
+
+  // internal
+  import { orderOptions } from '../data/operators';
+  import fieldsMixin from '../mixins/fields';
+  import DialogLayout from '../layouts/DialogLayout';
 
   export default {
     name: 'DbTableSort',
+    mixins: [fieldsMixin],
     components: {
       DialogLayout
     },
@@ -187,6 +192,3 @@
     }
   }
 </script>
-<style lang="stylus">
-
-</style>

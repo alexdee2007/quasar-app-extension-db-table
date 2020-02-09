@@ -142,17 +142,21 @@
 
 <script>
 
+  // global
   import { find } from 'lodash';
   import { singularize } from 'inflection';
-  import routerApi from 'src/api/router';
-  import { required, requiredIf } from 'vuelidate/lib/validators';
-  import { getErrorLabel } from 'src/utils/validators';
-  import fieldsMixin from 'src/mixins/fields';
 
-  import DialogLayout from 'layouts/DialogLayout';
-
-  import {  whereOptions, multipleWhereOptions } from 'src/data/operators';
+  // app
   import models from 'src/models';
+  import routerApi from 'src/api/router';
+
+  // internal
+  import { required, requiredIf } from 'vuelidate/lib/validators';
+  import fieldsMixin from '../mixins/fields';
+  import DialogLayout from '../layouts/DialogLayout';
+
+  import {  whereOptions, multipleWhereOptions } from '../data/operators';
+
 
   export default {
     name: 'DbTableFilter',
@@ -321,9 +325,6 @@
         });
 
       },
-      getError(obj) {
-        return getErrorLabel.call(this, obj);
-      },
       show() {
         this.$refs.dialog.show();
       },
@@ -470,6 +471,3 @@
     }
   }
 </script>
-<style lang="stylus">
-
-</style>
