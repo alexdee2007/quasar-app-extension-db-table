@@ -185,12 +185,12 @@
 
     </q-table>
 
-    <table-sort
+    <db-table-sort
       v-if="filterSort"
       ref="dialogSort"
       :model="model"
       />
-    <table-filter
+    <db-table-filter
       v-if="filterWhere"
       ref="dialogFilter"
       :model="model"
@@ -210,17 +210,15 @@
   import { exportFile } from 'quasar';
   import { find, set } from 'lodash';
   import moment from 'moment';
-  import fieldsMixin from 'src/mixins/fields';
   import modelApi from 'src/api/model';
-  import TableSort from 'src/dialogs/TableSort';
-  import TableFilter from 'src/dialogs/TableFilter';
+  import DbTableSort from '../dialogs/DbTableSort';
+  import DbTableFilter from '../dialogs/DbTableFilter';
 
   export default {
-    name: 'ETableData',
-    mixins: [fieldsMixin],
+    name: 'DbTableData',
     components: {
-      TableSort,
-      TableFilter
+      DbTableSort,
+      DbTableFilter
     },
     props: {
       title: {
