@@ -413,6 +413,7 @@
         this.selected = this.selection === 'none' ? [] : this.$refs.table.isRowSelected(props.key)
             ? this.selected.filter(row => row.id !== props.key)
             : [props.row];
+        this.$emit('row-click', props.row);
       },
       openColumnsDialog() {
         this.$q.dialog({
