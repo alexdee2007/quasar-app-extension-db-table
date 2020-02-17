@@ -104,7 +104,7 @@ export const multipleWhereOptions = [
     }, {
         stamp: 'CONTAINS LIKE',
         key: '$contlike',
-        value: 'містить подобно'
+        value: 'містить подібно'
     }, {
         stamp: 'NOT CONTAINS LIKE',
         key: '$ncontlike',
