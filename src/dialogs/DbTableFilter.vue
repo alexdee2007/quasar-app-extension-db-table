@@ -230,7 +230,7 @@
         return ['inq', 'nin', '$eq', '$neq', '$inq', '$nin', '$contains', '$ncontains'].includes(this.form.operator);
       },
       operatorOptions() {
-        return this.fieldObj.multiple ? multipleWhereOptions : this.fieldObj.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${fieldObj.language ? fieldObj.language : 'UK'}`] : whereOptions;
+        return this.fieldObj.multiple ? multipleWhereOptions : this.fieldObj.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${this.fieldObj.language ? this.fieldObj.language : 'UK'}`] : whereOptions;
       },
       disableValues() {
         return this.fieldObj.type === 'boolean' || [null, 'null', 'nnull', '$null', '$nnull'].includes(this.form.operator);
