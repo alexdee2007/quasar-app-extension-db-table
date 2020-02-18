@@ -45,40 +45,45 @@
 
               <div class="col">
                 <div class="row">
-                  <template v-if="multipleValues">
-                    <db-input
-                      :type="textValues ? 'text' : fieldType"
-                      v-model="form.multipleValue"
-                      class="col"
-                      classic-style
-                      label="Значення"
-                      multiple
-                      right-stamp
-                      key="field-multiple-value"
-                      :options-dense="false"
-                      :dict="selectOptions"
-                      :cascade="fieldObj.cascade"
-                      :upper-case="false"
-                      :validation="$v.form.multipleValue"
-                      />
-                  </template>
-                  <template v-else>
-                    <db-input
-                      :type="textValues ? 'text' : fieldType"
-                      v-model="form.value"
-                      class="col"
-                      classic-style
-                      :label="betweenValues ? 'З':'Значення'"
-                      right-stamp
-                      key="field-single-value"
-                      :disable="disableValues"
-                      :options-dense="false"
-                      :dict="selectOptions"
-                      :cascade="fieldObj.cascade"
-                      :upper-case="false"
-                      :validation="$v.form.value"
-                      />
-                  </template>
+
+                  <db-input
+                    v-if="multipleValues"
+                    :type="textValues ? 'text' : fieldType"
+                    v-model="form.multipleValue"
+                    class="col"
+                    classic-style
+                    label="Значення"
+                    multiple
+                    right-stamp
+                    option-stamp="key"
+                    key="field-multiple-value"
+                    :options-dense="false"
+                    :dict="fieldObj.dict"
+                    :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
+                    :cascade="fieldObj.cascade"
+                    :upper-case="false"
+                    :validation="$v.form.multipleValue"
+                    />
+
+                  <db-input
+                    v-else="!multipleValues"
+                    :type="textValues ? 'text' : fieldType"
+                    v-model="form.value"
+                    class="col"
+                    classic-style
+                    :label="betweenValues ? 'З':'Значення'"
+                    right-stamp
+                    option-stamp="key"
+                    key="field-single-value"
+                    :disable="disableValues"
+                    :options-dense="false"
+                    :dict="fieldObj.dict"
+                    :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
+                    :cascade="fieldObj.cascade"
+                    :upper-case="false"
+                    :validation="$v.form.value"
+                    />
+
                 </div>
                 <div v-if="betweenValues" class="row">
                   <db-input
@@ -88,9 +93,11 @@
                     classic-style
                     label="По"
                     right-stamp
+                    option-stamp="key"
                     key="field-second-value"
                     :options-dense="false"
-                    :dict="selectOptions"
+                    :dict="fieldObj.dict"
+                    :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
                     :cascade="fieldObj.cascade"
                     :upper-case="false"
                     :validation="$v.form.value2"
