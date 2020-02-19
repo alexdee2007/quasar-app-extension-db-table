@@ -296,16 +296,6 @@
         }
 
         return options;
-      },
-      selectOptions() {
-        if (!this.fieldObj.dict) {
-          return;
-        }
-        let options = this.getSelectOptions(this.fieldObj);
-        if (this.alphabetizeDicts) {
-          options = options.sort((a, b) => a.value.localeCompare(b.value));
-        }
-        return options;
       }
     },
     methods: {
@@ -450,7 +440,7 @@
         let valueLabel;
         if (['false', 'true', 'null', 'nnull', '$null', '$nnull'].includes(operator)) {
           valueLabel = '';
-        } else if (fieldObj.type === 'select' && fieldObj.dict && !['like', 'nlike', 'regexp', '$contlike', '$ncontlike'].includes(operator)) {
+        } else if (fieldObj.type === 'select' && fieldObj.dict && typeof fieldObj.dict !== 'function' && !['like', 'nlike', 'regexp', '$contlike', '$ncontlike'].includes(operator)) {
           if (['inq', 'nin', '$eq', '$neq', '$inq', '$nin', '$contains', '$ncontains'].includes(operator)) {
             const values = multipleValue.map(v => find(this.getSelectOptions(fieldObj), {key: v}));
             valueLabel = `(${values.map(v => v.value).join()})`;
