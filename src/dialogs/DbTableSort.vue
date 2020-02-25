@@ -1,6 +1,6 @@
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss no-esc-dismiss @hide="onHide" @show="onShow" :maximized="$q.screen.lt.md">
-    <dialog-layout ref="dialogLayout" :context="{label: 'Сортування', dialogWidth: '80vw' }">
+    <db-dialog-layout ref="dialogLayout" :context="{label: 'Сортування', dialogWidth: '80vw' }">
       <div :style="sortStyle" class="q-pa-md">
         <div class="row q-col-gutter-md q-pb-md">
           <db-input
@@ -50,7 +50,7 @@
         </q-toolbar>
       </template>
 
-    </dialog-layout>
+    </db-dialog-layout>
 
   </q-dialog>
 </template>
@@ -64,14 +64,10 @@
   // internal
   import { orderOptions } from '../data/operators';
   import fieldsMixin from '../mixins/fields';
-  import DialogLayout from '../layouts/DialogLayout';
 
   export default {
     name: 'DbTableSort',
     mixins: [fieldsMixin],
-    components: {
-      DialogLayout
-    },
     props: {
       model: String
     },
