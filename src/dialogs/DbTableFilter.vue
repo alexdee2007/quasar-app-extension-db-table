@@ -1,6 +1,6 @@
 <template>
   <q-dialog ref="dialog" no-backdrop-dismiss no-esc-dismiss @hide="onHide" @show="onShow" :maximized="$q.screen.lt.md">
-    <dialog-layout ref="dialogLayout" :context="{dialogWidth: '80vw'}">
+    <db-dialog-layout ref="dialogLayout" :context="{dialogWidth: '80vw'}">
       <template v-slot:header>
         <q-toolbar class="bg-primary text-white">
           <q-tabs v-model="$parent.filterTab" shrink stretch dense>
@@ -143,7 +143,7 @@
         </q-toolbar>
       </template>
 
-    </dialog-layout>
+    </db-dialog-layout>
   </q-dialog>
 </template>
 
@@ -160,17 +160,12 @@
   // internal
   import { required, requiredIf } from 'vuelidate/lib/validators';
   import fieldsMixin from '../mixins/fields';
-  import DialogLayout from '../layouts/DialogLayout';
 
   import {  whereOptions, multipleWhereOptions } from '../data/operators';
-
 
   export default {
     name: 'DbTableFilter',
     mixins: [fieldsMixin],
-    components: {
-      DialogLayout
-    },
     props: {
       model: String
     },
