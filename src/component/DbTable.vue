@@ -34,6 +34,8 @@
       @request="onRequest"
       table-style="max-height: calc(100vh - 220px)"
       virtual-scroll
+      :virtual-scroll-slice-size="60"
+      :virtual-scroll-item-size="41"
       :rows-per-page-options="$q.screen.lt.md ? [10]: [0]"
       hide-bottom
       >
