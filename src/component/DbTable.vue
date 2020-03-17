@@ -18,7 +18,7 @@
     <q-table
       ref="table"
       row-key="id"
-      :class="{'bg-grey-1':true, 'table-selected': !$q.screen.lt.md && selected.length}"
+      :class="{'bg-grey-1':true, 'table-selected': !$q.screen.lt.md && selected.length, 'q-table__no-selection': selection === 'none'}"
       :selection="selection"
       :grid="$q.screen.lt.md"
       :title="title"
@@ -164,8 +164,8 @@
           :props="props">
           <q-td v-if="selection !== 'none'" auto-width style="padding-top:0px; padding-bottom:0px;">
             <q-checkbox v-model="props.selected" />
-          </q-td>
-          <q-td v-for="col in props.cols" :key="col.name" :props="props" :style="col.wrap ? 'white-space: normal' : ''">
+          </q-td>	  
+          <q-td v-for="(col, key) in props.cols" :key="col.name" :props="props" :style="{whiteSpace: col.wrap ? 'normal' : ''}">
             <slot :name="`column-${col.name}`" :props="props" :col="col">
               <q-icon v-if="col.type==='boolean' && col.value" name="check" color="primary" />
               <q-icon v-else-if="col.type==='boolean' && !col.value" name="clear" color="light" />
