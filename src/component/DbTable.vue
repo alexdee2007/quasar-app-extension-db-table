@@ -164,7 +164,7 @@
           :props="props">
           <q-td v-if="selection !== 'none'" auto-width style="padding-top:0px; padding-bottom:0px;">
             <q-checkbox v-model="props.selected" />
-          </q-td>	  
+          </q-td>
           <q-td v-for="(col, key) in props.cols" :key="col.name" :props="props" :style="{whiteSpace: col.wrap ? 'normal' : ''}">
             <slot :name="`column-${col.name}`" :props="props" :col="col">
               <q-icon v-if="col.type==='boolean' && col.value" name="check" color="primary" />
@@ -175,6 +175,27 @@
             </slot>
           </q-td>
         </q-tr>
+      </template>
+
+      <template v-slot:item="props">
+        <div
+          class="q-table__grid-item col-xs-12 col-sm-6 col-md-4 col-lg-3"
+          :class="{'q-table__grid-item--selected': props.selected === true}"
+          @click="rowClick(props)"
+          >
+          <div class="q-table__grid-item-card q-table__card" :class="classRow(props)">
+            <template v-if="selection !== 'none'">
+              <div class="q-table__grid-item-row">
+                <q-checkbox dense v-model="props.selected" />
+              </div>
+              <q-separator />
+            </template>
+            <div v-for="(col, key) in props.cols" class="q-table__grid-item-row">
+              <div class="q-table__grid-item-title">{{ col.label }}</div>
+              <div class="q-table__grid-item-value">{{ col.value }}</div>
+            </div>
+          </div>
+        </div>
       </template>
 
       <template slot="pagination" slot-scope="props">
