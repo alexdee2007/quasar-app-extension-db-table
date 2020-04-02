@@ -155,7 +155,6 @@
 
   // app
   import models from 'src/models';
-  import routerApi from 'src/api/router';
 
   // internal
   import { required, requiredIf } from 'vuelidate/lib/validators';
@@ -380,7 +379,7 @@
       async getSqlWhere() {
         try {
           this.$q.loading.show({message: 'Завантаження'});
-          this.sql = await routerApi.getSqlWhere(this.model, this.where);
+          this.sql = await this.$api.router.getSqlWhere(this.model, this.where);
           this.$parent.filterTab = 'sql';
         } catch (err) {
           console.error(err);

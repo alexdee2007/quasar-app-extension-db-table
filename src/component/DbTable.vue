@@ -235,9 +235,6 @@
   import { find, set } from 'lodash';
   import moment from 'moment';
 
-  // app
-  import modelApi from 'src/api/model';
-
   //internal
   import fieldsMixin from '../mixins/fields';
   import DbTableSort from '../dialogs/DbTableSort';
@@ -530,7 +527,7 @@
         try {
           this.loading = true;
           this.selected = [];
-          const count = await modelApi.count(this.model, this.initWhere);
+          const count = await this.$api.model.count(this.model, this.initWhere);
           if (count > this.rowsLimit) {
             this.tableMode = 'server';
           } else {
@@ -557,7 +554,7 @@
             filter.order = this.sort.order.slice();
           }
           filter.allRows = true;
-          let data = await modelApi.find(this.model, filter);
+          let data = await this.$api.model.find(this.model, filter);
           var csvContent = this.builHtmlTable(fields, data);
           const status = exportFile(`${this.model}Export.xls`, csvContent, 'application/vnd.ms-excel');
           if (status !== true) {
@@ -688,7 +685,7 @@
 
           }
 
-          const data = await modelApi.find(this.model, filter);
+          const data = await this.$api.model.find(this.model, filter);
 
           // Update selected rows data
           const selectedKeys = this.selected.map(row => row.id);
@@ -701,7 +698,7 @@
             this.data = [];
             this.clientInteraction(pagination);
           } else { // server mode
-            this.pagination.rowsNumber = await modelApi.count(this.model, filter.where);
+            this.pagination.rowsNumber = await this.$api.model.count(this.model, filter.where);
             this.tableData = [];
             this.data = data;
           }
