@@ -3,7 +3,7 @@ import { snakeCase, get, set } from 'lodash';
 import { singularize } from 'inflection';
 
 //app
-import models from 'src/models';
+import * as models from 'src/models';
 
 //internal
 import { truncDateString } from '../utils/strings';

@@ -154,7 +154,7 @@
   import { singularize } from 'inflection';
 
   // app
-  import models from 'src/models';
+  import * as models from 'src/models';
 
   // internal
   import { required, requiredIf } from 'vuelidate/lib/validators';
