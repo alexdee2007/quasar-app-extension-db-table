@@ -232,7 +232,7 @@
 
   // global
   import { exportFile } from 'quasar';
-  import { find, set } from 'lodash';
+  import { find, set, isEmpty } from 'lodash';
   import moment from 'moment';
 
   //internal
@@ -257,7 +257,7 @@
         required: true
       },
       model: {
-        type: String,
+        type: Function,
         required: true
       },
       initWhere: {
@@ -367,7 +367,9 @@
       columns() {
         const columns = [];
         this.tableFields.forEach(tableField => {
-          const modelField = this.getFieldObj(tableField.name);
+
+          const modelField = this.model.getField(tableField.name);
+
           let column = {
             name: tableField.name,
             prepend: tableField.prepend,
@@ -379,49 +381,46 @@
             hidden: tableField.hidden ? true : false,
             wrap: tableField.wrap ? true : false,
             type: tableField.type !== undefined ? tableField.type : modelField.type,
-            dict: tableField.dict !== undefined ? tableField.dict : (modelField.dict !== undefined ? `${modelField.dict}&language=${modelField.language ? modelField.language : 'UK'}` : undefined),
             sort: tableField.sort,
             format: tableField.format
           };
-          if (column.type === 'date' && !column.format) {
-            column.format = val => val ? moment(val, 'DD.MM.YYYY').format('DD.MM.YYYY') : '';
-          }
+
           if (['datetime', 'date'].includes(column.type) && column.sortable && !column.sort) {
             column.sort = (a, b) => (a && a.trim()) ? moment(a, 'DD.MM.YYYY HH:mm:ss') - moment(b, 'DD.MM.YYYY HH:mm:ss') : -1;
           }
+
           if (column.type === 'boolean' && column.sortable && !column.sort) {
             column.sort = (a, b) => a - b;
           }
-          if (column.type === 'select' && this.$store.getters.DICTS[column.dict]) {
-            if (!column.format) {
-              column.format = (val) => {
-                const v = this.$store.getters.DICT(column.dict).find(v => v.key === val);
-                return v ? v.value : val;
-              }
-            }
 
-            // Сортировка спр. поля по значению а не ключу (откл. - производительность на больших данных ??? )
-            /*
-             if (column.sortable && !column.sort) {
-             column.sort = (a, b) => {
-             const a1 = this.$store.state.getters.DICT(column.dict).find(v => v.key === a);
-             const b1 = this.$store.state..getters.DICT(column.dict).find(v => v.key === b);
-             return (a1 ? a1.value : a).localeCompare(b1 ? b1.value : b);
-             }
-             }
-             */
-
-          }
+          // TODO: tests
+          // Сортировка спр. поля по значению а не ключу (откл. - производительность на больших данных ))
+          /*
+           if (column.sortable && !column.sort) {
+           column.sort = (a, b) => {
+           const a1 = this.model.getValue(tableField.name, a);
+           const b1 = this.model.getValue(tableField.name, b);
+           return (a1 ? a1.value : a).localeCompare(b1 ? b1.value : b);
+           }
+           }
+           */
 
           if (column.type === 'text' && column.sortable && !column.sort) {
             column.sort = (a, b) => a.localeCompare(b);
           }
 
+          if (!column.format) {
+            column.format = (val) => this.model.getValue(tableField.name, val);
+          }
+
           columns.push(column);
+
         });
+
         if (!find(columns, {name: 'id'})) {
           columns.push({name: 'id', hidden: true});
         }
+
         return columns;
       },
       columnsFilter() {
@@ -477,7 +476,7 @@
           message: 'Оберіть колонки для експорту даних в Excel',
           options: {
             type: 'checkbox',
-            model: this.columnsFilter.filter(field => this.getFieldObj(field).export !== false),
+            model: this.columnsFilter.filter(fldName => this.model.getField(fldName).export !== false),
             items: this.getFieldOptions((field) => field.export !== false).map(val => ({
                 label: val.value,
                 value: val.key
@@ -527,7 +526,7 @@
         try {
           this.loading = true;
           this.selected = [];
-          const count = await this.$api.model.count(this.model, this.initWhere);
+          const count = await this.model.count(this.initWhere);
           if (count > this.rowsLimit) {
             this.tableMode = 'server';
           } else {
@@ -554,9 +553,9 @@
             filter.order = this.sort.order.slice();
           }
           filter.allRows = true;
-          let data = await this.$api.model.find(this.model, filter);
+          let data = await this.model.find(filter);
           var csvContent = this.builHtmlTable(fields, data);
-          const status = exportFile(`${this.model}Export.xls`, csvContent, 'application/vnd.ms-excel');
+          const status = exportFile(`${this.model.name}Export.xls`, csvContent, 'application/vnd.ms-excel');
           if (status !== true) {
             this.$q.notify({message: 'Браузер відхилив завантаження файла...', color: 'negative', icon: 'warning'})
           }
@@ -569,9 +568,11 @@
       builHtmlTable(fields, data) {
         let tbl = [];
         tbl.push('<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /><style type="text/css">.th{background-color: "#c1c1c1"}td{mso-number-format:"\@"}</style></head><body><table border="1"><thead><tr>');
+
+        // THEAD
         fields.map(fieldName => {
-          const modelField = this.modelObj.fields[fieldName];
-          if (modelField) {
+          const modelField = this.model.getField(fieldName);
+          if (!isEmpty(modelField)) {
             tbl.push('<th class="th">');
             tbl.push(modelField.label || fieldName);
             tbl.push('</th>');
@@ -579,35 +580,16 @@
         });
         tbl.push('</tr></thead><tbody>');
 
+        // TBODY
         data.map(row => {
           tbl.push('<tr>');
           fields.map(fieldName => {
-            const modelField = this.modelObj.fields[fieldName];
-            let dictName = '';
-            if (modelField) {
+            const modelField = this.model.getField(fieldName);
+            if (!isEmpty(modelField)) {
               tbl.push('<td>');
               if (row[fieldName] !== null) {
-                if (modelField.dict) {
-                  dictName = `${modelField.dict}&language=${modelField.language ? modelField.language : 'UK'}`;
-                }
-                if (modelField.type === 'select' && this.$store.getters.DICTS[dictName] && modelField.multiple === true) {
-                  let vals = [];
-                  row[fieldName].map(val => {
-                    const v = this.$store.getters.DICT(dictName).find(v => v.key === val);
-                    vals.push(v ? v.value : val);
-                  });
-                  tbl.push(vals.join());
-                } else if (modelField.type === 'select' && this.$store.getters.DICTS[dictName]) {
-                  const v = this.$store.getters.DICT(dictName).find(v => v.key === row[fieldName]);
-                  tbl.push(v ? v.value : row[fieldName]);
-                } else if (modelField.type === 'date') {
-                  tbl.push(moment(row[fieldName], 'DD.MM.YYYY').format('DD.MM.YYYY'));
-                } else if (modelField.type === 'boolean') {
-                  const v = this.$store.getters.DICT(`BOOL&language=${modelField.language ? modelField.language : 'UK'}`).find(v => v.value === String(row[fieldName]));
-                  tbl.push(v ? v.label : row[fieldName]);
-                } else {
-                  tbl.push(row[fieldName]);
-                }
+                tbl.push(this.model.getValue(fieldName, row[fieldName]));
+
               }
               tbl.push('</td>');
             }
@@ -685,7 +667,7 @@
 
           }
 
-          const data = await this.$api.model.find(this.model, filter);
+          const data = await this.model.find(filter);
 
           // Update selected rows data
           const selectedKeys = this.selected.map(row => row.id);
@@ -698,7 +680,7 @@
             this.data = [];
             this.clientInteraction(pagination);
           } else { // server mode
-            this.pagination.rowsNumber = await this.$api.model.count(this.model, filter.where);
+            this.pagination.rowsNumber = await this.model.count(filter.where);
             this.tableData = [];
             this.data = data;
           }

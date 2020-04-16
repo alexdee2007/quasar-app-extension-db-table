@@ -69,7 +69,7 @@
     name: 'DbTableSort',
     mixins: [fieldsMixin],
     props: {
-      model: String
+      model: Function
     },
     data() {
       return {

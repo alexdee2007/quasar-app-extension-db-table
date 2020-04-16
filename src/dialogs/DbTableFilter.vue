@@ -150,7 +150,7 @@
 <script>
 
   // global
-  import { find } from 'lodash';
+  import { find, isEmpty, map } from 'lodash';
   import { singularize } from 'inflection';
 
   // app
@@ -166,7 +166,7 @@
     name: 'DbTableFilter',
     mixins: [fieldsMixin],
     props: {
-      model: String
+      model: Function
     },
     data() {
       return {
@@ -219,7 +219,7 @@
         return this.form.field ? this.fieldObj.type : 'text';
       },
       cascadeFields() {
-        return this.$store.getters.MODELS_RELATIONS[this.model] && this.$store.getters.MODELS_RELATIONS[this.model].filter(rel => ['hasMany', 'hasOne'].includes(rel.type)).length > 0;
+        return this.model.relations.length > 0;
       },
       textValues() {
         return ['text', 'textarea', 'email', 'tel', 'number'].includes(this.fieldType) || ['like', 'nlike', 'regexp', '$contlike', '$ncontlike'].includes(this.form.operator);
@@ -238,35 +238,40 @@
       },
       fieldOptions() {
 
-        const filter = (field) => field.filter !== false;
-        let options = this.getFieldOptions(filter);
+
+        let options = this.getFieldOptions(field => field.filter !== false);
 
         this.$parent.columns.map(col => {
 
-          if (col.name.includes('.')) {
+          if (col.model) {
             options.push({
               value: col.label,
               key: col.name,
               stamp: col.name,
-              prepend: col.prepend
+              prepend: col.prepend,
+              model: col.model
             });
           }
         });
+
         const iterator = (relation, prevKey, prevLabel) => {
+
           if (['hasMany', 'hasOne'].includes(relation.type)) {
-            const model = models[relation.modelTo];
+
+            let model = relation.model;
+
             if (model) {
-
               const newKey = prevKey ? `${prevKey}.${relation.name}` : relation.name;
-              const newLabel = prevLabel ? `${prevLabel}.${model.name}` : model.name;
-
+              const newLabel = prevLabel ? `${prevLabel}.${model.title}` : model.title;
+              
               options.push({
                 value: newLabel,
                 key: `${newKey}.*`,
                 stamp: newKey,
+                model
               });
 
-              this.getFieldOptions(filter, model).map((opt) => {
+              this.getFieldOptions((field) => field.filter !== false, model).map((opt) => {
                 options.push({
                   value: `${newLabel}.${opt.value}`,
                   key: `${newKey}.${opt.key}`,
@@ -274,16 +279,20 @@
                 });
               });
 
-              this.$store.getters.MODELS_RELATIONS[relation.modelTo] && this.$store.getters.MODELS_RELATIONS[relation.modelTo].map(relation => {
-                return iterator(relation, newKey, newLabel);
-              });
+              /*
+               this.$store.getters.MODELS_RELATIONS[relation.modelTo] && this.$store.getters.MODELS_RELATIONS[relation.modelTo].map(relation => {
+               return iterator(relation, newKey, newLabel);
+               });
+               */
             }
           }
         }
-
-        this.$store.getters.MODELS_RELATIONS[this.model] && this.$store.getters.MODELS_RELATIONS[this.model].map(relation => {
-          iterator(relation);
-        });
+        /*
+         this.$store.getters.MODELS_RELATIONS[this.model] && this.$store.getters.MODELS_RELATIONS[this.model].map(relation => {
+         iterator(relation);
+         });
+         */
+        this.model.relations().map(relation => iterator(relation));
 
         if (this.alphabetizeColumns) {
           options = options.sort((a, b) => a.value.localeCompare(b.value));
@@ -427,7 +436,7 @@
         const fieldName = splittedField.shift();
         const model = models[singularize(splittedField.shift() || '')];
 
-        const fieldObj = this.getFieldObj(fieldName, model);
+        const fieldObj = this.model.getField(fieldName);
         const fieldLabel = find(this.fieldOptions, {key: field}).value;
         const operatorLabel = find(this.getOperatorOptions(fieldObj), {key: operator}).value;
 
