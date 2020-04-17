@@ -57,11 +57,8 @@
 
 <script>
 
-  // global
   import { find } from 'lodash';
   import { required } from 'vuelidate/lib/validators';
-
-  // internal
   import { orderOptions } from '../data/operators';
   import fieldsMixin from '../mixins/fields';
 
@@ -104,8 +101,7 @@
         };
       },
       fieldOptions() {
-        const filter = (field) => !field.multiple && field.sort !== false;
-        let options = this.getFieldOptions(filter).map(option => {
+        let options = this.getFieldOptions(field => !field.multiple && field.sort !== false).map(option => {
           option.dsbl = find(this.forms, {field: option.key}) ? true : undefined;
           return option;
         });

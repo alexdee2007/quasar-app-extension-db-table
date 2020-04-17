@@ -58,9 +58,9 @@
                     option-stamp="key"
                     key="field-multiple-value"
                     :options-dense="false"
-                    :dict="fieldObj.dict"
+                    :dict="field.dict"
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
-                    :cascade="fieldObj.cascade"
+                    :cascade="field.cascade"
                     :upper-case="false"
                     :validation="$v.form.multipleValue"
                     />
@@ -77,9 +77,9 @@
                     key="field-single-value"
                     :disable="disableValues"
                     :options-dense="false"
-                    :dict="fieldObj.dict"
+                    :dict="field.dict"
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
-                    :cascade="fieldObj.cascade"
+                    :cascade="field.cascade"
                     :upper-case="false"
                     :validation="$v.form.value"
                     />
@@ -96,9 +96,9 @@
                     option-stamp="key"
                     key="field-second-value"
                     :options-dense="false"
-                    :dict="fieldObj.dict"
+                    :dict="field.dict"
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
-                    :cascade="fieldObj.cascade"
+                    :cascade="field.cascade"
                     :upper-case="false"
                     :validation="$v.form.value2"
                     />
@@ -149,17 +149,9 @@
 
 <script>
 
-  // global
-  import { find, isEmpty, map } from 'lodash';
-  import { singularize } from 'inflection';
-
-  // app
-  import * as models from 'src/models';
-
-  // internal
+  import { find } from 'lodash';
   import { required, requiredIf } from 'vuelidate/lib/validators';
   import fieldsMixin from '../mixins/fields';
-
   import {  whereOptions, multipleWhereOptions } from '../data/operators';
 
   export default {
@@ -195,6 +187,12 @@
       }
     },
     computed: {
+      fieldOptionsIndexedByKey() {
+        return this.fieldOptions.reduce((map, option, index) => {
+          map[option.key] = index;
+          return map;
+        }, {});
+      },
       filterTabStyle() {
         return {
           height: this.$q.screen.lt.md ? '100%' : '50vh',
@@ -216,10 +214,10 @@
         };
       },
       fieldType() {
-        return this.form.field ? this.fieldObj.type : 'text';
+        return this.form.field ? this.field.type : 'text';
       },
       cascadeFields() {
-        return this.model.relations.length > 0;
+        return this.model.relations().length > 0;
       },
       textValues() {
         return ['text', 'textarea', 'email', 'tel', 'number'].includes(this.fieldType) || ['like', 'nlike', 'regexp', '$contlike', '$ncontlike'].includes(this.form.operator);
@@ -231,67 +229,50 @@
         return ['inq', 'nin', '$eq', '$neq', '$inq', '$nin', '$contains', '$ncontains'].includes(this.form.operator);
       },
       operatorOptions() {
-        return this.fieldObj.multiple ? multipleWhereOptions : this.fieldObj.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${this.fieldObj.language ? this.fieldObj.language : 'UK'}`] : whereOptions;
+        return this.field.multiple ? multipleWhereOptions
+            : this.field.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${this.field.language ? this.field.language : 'UK'}`]
+            : whereOptions;
       },
       disableValues() {
-        return this.fieldObj.type === 'boolean' || [null, 'null', 'nnull', '$null', '$nnull'].includes(this.form.operator);
+        return this.field.type === 'boolean' || [null, 'null', 'nnull', '$null', '$nnull'].includes(this.form.operator);
       },
       fieldOptions() {
 
+        const filter = (field) => field.filter !== false;
+        let options = this.getFieldOptions(filter);
 
-        let options = this.getFieldOptions(field => field.filter !== false);
-
-        this.$parent.columns.map(col => {
-
-          if (col.model) {
-            options.push({
-              value: col.label,
-              key: col.name,
-              stamp: col.name,
-              prepend: col.prepend,
-              model: col.model
-            });
-          }
+        this.$parent.columns.filter(col => col.model).forEach(col => {
+          options.push({
+            value: col.label,
+            key: col.name,
+            stamp: col.name,
+            prepend: col.prepend,
+            model: col.model
+          });
         });
 
         const iterator = (relation, prevKey, prevLabel) => {
-
-          if (['hasMany', 'hasOne'].includes(relation.type)) {
-
-            let model = relation.model;
-
-            if (model) {
-              const newKey = prevKey ? `${prevKey}.${relation.name}` : relation.name;
-              const newLabel = prevLabel ? `${prevLabel}.${model.title}` : model.title;
-              
+          const model = relation.model;
+          if (model) {
+            const newKey = prevKey ? `${prevKey}.${relation.name}` : relation.name;
+            const newLabel = prevLabel ? `${prevLabel}.${model.title}` : model.title;
+            options.push({
+              value: newLabel,
+              key: `${newKey}.*`,
+              stamp: newKey
+            });
+            this.getFieldOptions((field) => field.filter !== false, model).map((opt) => {
               options.push({
-                value: newLabel,
-                key: `${newKey}.*`,
-                stamp: newKey,
+                value: `${newLabel}.${opt.value}`,
+                key: `${newKey}.${opt.key}`,
+                stamp: `${newKey}.${opt.key}`,
                 model
               });
-
-              this.getFieldOptions((field) => field.filter !== false, model).map((opt) => {
-                options.push({
-                  value: `${newLabel}.${opt.value}`,
-                  key: `${newKey}.${opt.key}`,
-                  stamp: `${newKey}.${opt.key}`,
-                });
-              });
-
-              /*
-               this.$store.getters.MODELS_RELATIONS[relation.modelTo] && this.$store.getters.MODELS_RELATIONS[relation.modelTo].map(relation => {
-               return iterator(relation, newKey, newLabel);
-               });
-               */
-            }
+            });
+            model.relations().map(relation => iterator(relation, newKey, newLabel));
           }
         }
-        /*
-         this.$store.getters.MODELS_RELATIONS[this.model] && this.$store.getters.MODELS_RELATIONS[this.model].map(relation => {
-         iterator(relation);
-         });
-         */
+
         this.model.relations().map(relation => iterator(relation));
 
         if (this.alphabetizeColumns) {
@@ -388,7 +369,7 @@
       async getSqlWhere() {
         try {
           this.$q.loading.show({message: 'Завантаження'});
-          this.sql = await this.$api.router.getSqlWhere(this.model, this.where);
+          this.sql = await this.$api.router.getSqlWhere(this.model.name, this.where);
           this.$parent.filterTab = 'sql';
         } catch (err) {
           console.error(err);
@@ -432,12 +413,12 @@
       },
       fillMemo( {field, operator, value, value2, multipleValue}) {
 
-        const splittedField = field.split('.').reverse();
-        const fieldName = splittedField.shift();
-        const model = models[singularize(splittedField.shift() || '')];
+        const option = this.fieldOptions[this.fieldOptionsIndexedByKey[field]];
+        const fieldName = field.split('.').reverse().shift();
+        const model = option.model || this.model;
 
-        const fieldObj = this.model.getField(fieldName);
-        const fieldLabel = find(this.fieldOptions, {key: field}).value;
+        const fieldObj = model.getField(fieldName);
+        const fieldLabel = option.value;
         const operatorLabel = find(this.getOperatorOptions(fieldObj), {key: operator}).value;
 
         let valueLabel;

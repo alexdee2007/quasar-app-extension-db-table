@@ -382,7 +382,8 @@
             wrap: tableField.wrap ? true : false,
             type: tableField.type !== undefined ? tableField.type : modelField.type,
             sort: tableField.sort,
-            format: tableField.format
+            format: tableField.format,
+            model: tableField.model
           };
 
           if (['datetime', 'date'].includes(column.type) && column.sortable && !column.sort) {
