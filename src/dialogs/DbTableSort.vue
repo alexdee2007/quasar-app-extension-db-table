@@ -11,7 +11,7 @@
             label="Колонка"
             :dict="fieldOptions"
             :options-dense="false"
-            :validation="$v.form.field"
+            :validate="$v.form.field"
             />
           <div class="row col-xs-12 col-md-6">
             <db-input
@@ -23,7 +23,7 @@
               label="Напрямок"
               :dict="orderOptions"
               :options-dense="false"
-              :validation="$v.form.operator"
+              :validate="$v.form.operator"
               />
             <div>
               <q-btn icon="add" class="on-right" @click="addFilter" color="primary" rounded glossy size="md"><q-tooltip>Додати</q-tooltip></q-btn>

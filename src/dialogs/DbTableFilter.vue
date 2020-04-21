@@ -26,7 +26,7 @@
               :cascade="cascadeFields"
               cascade-mixed
               :options-dense="false"
-              :validation="$v.form.field"
+              :validate="$v.form.field"
               @input="form.operator=null; clearValues();"
               />
             <db-input
@@ -38,7 +38,7 @@
               label="Оператор"
               :dict="operatorOptions"
               :options-dense="false"
-              :validation="$v.form.operator"
+              :validate="$v.form.operator"
               @input="clearValues"
               />
             <div class="row col-xs-12 col-md-4 items-end">
@@ -62,7 +62,7 @@
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
                     :cascade="field.cascade"
                     :upper-case="false"
-                    :validation="$v.form.multipleValue"
+                    :validate="$v.form.multipleValue"
                     />
 
                   <db-input
@@ -81,7 +81,7 @@
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
                     :cascade="field.cascade"
                     :upper-case="false"
-                    :validation="$v.form.value"
+                    :validate="$v.form.value"
                     />
 
                 </div>
@@ -100,7 +100,7 @@
                     :sort-options="alphabetizeDicts ? (a, b) => a.value.localeCompare(b.value) : undefined"
                     :cascade="field.cascade"
                     :upper-case="false"
-                    :validation="$v.form.value2"
+                    :validate="$v.form.value2"
                     />
                 </div>
               </div>
