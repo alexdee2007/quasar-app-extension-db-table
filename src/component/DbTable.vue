@@ -230,12 +230,10 @@
 
 <script>
 
-  // global
   import { exportFile } from 'quasar';
   import { find, set, isEmpty } from 'lodash';
   import moment from 'moment';
 
-  //internal
   import fieldsMixin from '../mixins/fields';
   import DbTableSort from '../dialogs/DbTableSort';
   import DbTableFilter from '../dialogs/DbTableFilter';
@@ -527,7 +525,7 @@
         try {
           this.loading = true;
           this.selected = [];
-          const count = await this.model.count(this.initWhere);
+          const count = await this.$api.model.count(this.model.name, this.initWhere);
           if (count > this.rowsLimit) {
             this.tableMode = 'server';
           } else {
@@ -554,7 +552,7 @@
             filter.order = this.sort.order.slice();
           }
           filter.allRows = true;
-          let data = await this.model.find(filter);
+          let data = await this.$api.model.find(this.model.name, filter);
           var csvContent = this.builHtmlTable(fields, data);
           const status = exportFile(`${this.model.name}Export.xls`, csvContent, 'application/vnd.ms-excel');
           if (status !== true) {
@@ -668,7 +666,7 @@
 
           }
 
-          const data = await this.model.find(filter);
+          const data = await this.$api.model.find(this.model.name, filter);
 
           // Update selected rows data
           const selectedKeys = this.selected.map(row => row.id);
@@ -681,7 +679,7 @@
             this.data = [];
             this.clientInteraction(pagination);
           } else { // server mode
-            this.pagination.rowsNumber = await this.model.count(filter.where);
+            this.pagination.rowsNumber = await this.$api.model.count(this.model.name, filter.where);
             this.tableData = [];
             this.data = data;
           }
