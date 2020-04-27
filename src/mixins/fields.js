@@ -14,7 +14,7 @@ export default {
   },
   methods: {
     getFieldOptions(customFilter = () => true, model = this.model) {
-      return map(pickBy(model.fields(), field => field.filter !== false && field.type !== 'model' && customFilter(field)),
+      return map(pickBy(model.fields(), field => field.filter !== false && ['model', 'models'].indexOf(field.type) === -1 && customFilter(field)),
           (field, key) => ({value: field.label, key, stamp: snakeCase(key)})
       )
     }

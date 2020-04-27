@@ -7,9 +7,6 @@
           <template v-slot:prepend>
             <q-icon name="search" />
           </template>
-          <template v-if="quickSearch" v-slot:append>
-            <q-icon name="cancel" @click.stop="quickSearch = null" class="cursor-pointer" />
-          </template>
         </db-input>
         <slot name="extra-search" :initTable="initTable" />
       </template>

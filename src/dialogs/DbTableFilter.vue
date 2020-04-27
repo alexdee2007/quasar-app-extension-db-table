@@ -217,7 +217,7 @@
         return this.form.field ? this.field.type : 'text';
       },
       cascadeFields() {
-        return this.model.relations().length > 0;
+        return this.model.relations().filter(rel => rel.filter !== false).length > 0;
       },
       textValues() {
         return ['text', 'textarea', 'email', 'tel', 'number'].includes(this.fieldType) || ['like', 'nlike', 'regexp', '$contlike', '$ncontlike'].includes(this.form.operator);
@@ -255,7 +255,7 @@
           const model = relation.model;
           if (model) {
             const newKey = prevKey ? `${prevKey}.${relation.name}` : relation.name;
-            const newLabel = prevLabel ? `${prevLabel}.${model.title}` : model.title;
+            const newLabel = prevLabel ? `${prevLabel}.${relation.label}` : relation.label;
             options.push({
               value: newLabel,
               key: `${newKey}.*`,
@@ -269,11 +269,11 @@
                 model
               });
             });
-            model.relations().map(relation => iterator(relation, newKey, newLabel));
+            model.relations().filter(rel => rel.filter !== false).map(rel => iterator(rel, newKey, newLabel));
           }
         }
 
-        this.model.relations().map(relation => iterator(relation));
+        this.model.relations().filter(rel => rel.filter !== false).map(rel => iterator(rel));
 
         if (this.alphabetizeColumns) {
           options = options.sort((a, b) => a.value.localeCompare(b.value));
