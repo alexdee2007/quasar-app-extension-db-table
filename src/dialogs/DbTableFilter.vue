@@ -230,7 +230,7 @@
       },
       operatorOptions() {
         return this.field.multiple ? multipleWhereOptions
-            : this.field.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${this.field.language ? this.field.language : 'UK'}`]
+            : this.field.type === 'boolean' ? this.$store.getters.DICTS[`BOOL,${this.field.language ? this.field.language : 'UK'}`]
             : whereOptions;
       },
       disableValues() {
@@ -285,14 +285,14 @@
     methods: {
       getSelectOptions(field) {
         let options = [];
-        const dictName = `${field.dict}&language=${field.language ? field.language : 'UK'}`;
+        const dictName = `${field.dict},${field.language ? field.language : 'UK'}`;
         this.$store.getters.DICTS[dictName] && this.$store.getters.DICT(dictName).forEach(val => {
           options.push({key: val.key, value: val.value, stamp: val.key});
         });
         return options;
       },
       getOperatorOptions(field) {
-        return field.multiple ? multipleWhereOptions : field.type === 'boolean' ? this.$store.getters.DICTS[`BOOL&language=${field.language ? field.language : 'UK'}`] : whereOptions;
+        return field.multiple ? multipleWhereOptions : field.type === 'boolean' ? this.$store.getters.DICTS[`BOOL,${field.language ? field.language : 'UK'}`] : whereOptions;
       },
       revertFilter(index) {
         const form = this.forms[index];
