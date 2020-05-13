@@ -39,87 +39,91 @@
 
       <template v-slot:top="props">
         <q-slide-transition>
-          <div v-if="!selected.length || $q.screen.lt.md" class="flex flex-center full-width">
-            <q-btn
-              v-if="addRow && !$q.screen.lt.md"
-              icon="add"
-              color="pink-13"
-              @click="addRow"
-              rounded
+          <div v-if="!selected.length || $q.screen.lt.md" class="flex flex-center full-width row">
+            <div class="col-xs-12 col-sm-6" :class="{'text-left': !$q.screen.lt.sm, 'text-center': $q.screen.lt.sm}">
+              <q-btn
+                v-if="addRow && !$q.screen.lt.md"
+                icon="add"
+                color="pink-13"
+                @click="addRow"
+                rounded
               class="on-right"
-              label="Додати"
-              />
-            <q-btn
-              color="primary"
-              class="on-right"
-              flat
-              round
-              icon="refresh"
-              @click="serverInteraction()"
-              ><q-tooltip>Оновити</q-tooltip>
-            </q-btn>
-            <q-btn
-              v-if="filterWhere"
-              color="primary"
-              class="on-right"
-              :flat="filter.where.length === 0 && !filter.sql"
-              round
-              icon="filter_list"
-              @click="$refs.dialogFilter.show()"
-              ><q-tooltip>Фільтр</q-tooltip>
-            </q-btn>
-            <q-btn
-              v-if="filterSort"
-              color="primary"
-              class="on-right"
-              :flat="sort.order.length === 0"
-              round
-              icon="sort"
-              @click="$refs.dialogSort.show()"
-              ><q-tooltip>Сортування</q-tooltip>
-            </q-btn>
-            <q-btn color="primary" flat round icon="more_vert" >
-              <q-menu>
-                <q-list link>
-                  <q-item v-if="visibleColumnOptions.length" clickable v-close-popup @click.native="openColumnsDialog">
-                    <q-item-section avatar>
-                      <q-icon name="view_column" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Колонки</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click.native="openGridsDialog">
-                    <q-item-section avatar>
-                      <q-icon name="view_module" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Сітка</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                  <q-item clickable v-close-popup @click.native="openExportDialog">
-                    <q-item-section avatar>
-                      <q-icon name="file_download" />
-                    </q-item-section>
-                    <q-item-section>
-                      <q-item-label>Експорт</q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </q-menu>
-            </q-btn>
-            <q-space />
-            <template v-if="$refs.table && props.pagination.rowsNumber">
-              <span class="q-table__bottom-item">{{ $q.lang.table.pagination($refs.table.firstRowIndex + 1, Math.min(props.pagination.page*props.pagination.rowsPerPage, props.pagination.rowsNumber), props.pagination.rowsNumber) }}</span>
-              <q-btn :color="$refs.table.color" round icon="first_page" dense flat :disable="props.isFirstPage" @click="$refs.table.setPagination({page: 1})" />
-              <q-btn :color="$refs.table.color" round icon="chevron_left" dense flat :disable="props.isFirstPage" @click="props.prevPage" />
-              <q-btn :color="$refs.table.color" round icon="chevron_right" dense flat :disable="props.isLastPage" @click="props.nextPage" />
-              <q-btn class="on-left" :color="$refs.table.color" round icon="last_page" dense flat :disable="props.isLastPage" @click="$refs.table.setPagination({page: props.pagesNumber})" />
-            </template>
-            <template v-else>
-              <q-icon :name="$q.iconSet.table.warning" size="sm" class="q-mr-sm"/>
-              {{ quickSearch ? $q.lang.table.noResults: loading ? $q.lang.table.loading : $q.lang.table.noData }}
-            </template>
+                label="Додати"
+                />
+              <q-btn
+                color="primary"
+                :class="{'on-right': !$q.screen.lt.md}"
+                flat
+                round
+                icon="refresh"
+                @click="serverInteraction()"
+                ><q-tooltip>Оновити</q-tooltip>
+              </q-btn>
+              <q-btn
+                v-if="filterWhere"
+                color="primary"
+                class="on-right"
+                :flat="filter.where.length === 0 && !filter.sql"
+                round
+                icon="filter_list"
+                @click="$refs.dialogFilter.show()"
+                ><q-tooltip>Фільтр</q-tooltip>
+              </q-btn>
+              <q-btn
+                v-if="filterSort"
+                color="primary"
+                class="on-right"
+                :flat="sort.order.length === 0"
+                round
+                icon="sort"
+                @click="$refs.dialogSort.show()"
+                ><q-tooltip>Сортування</q-tooltip>
+              </q-btn>
+              <q-btn color="primary" flat round icon="more_vert" >
+                <q-menu>
+                  <q-list link>
+                    <q-item v-if="visibleColumnOptions.length" clickable v-close-popup @click.native="openColumnsDialog">
+                      <q-item-section avatar>
+                        <q-icon name="view_column" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>Колонки</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click.native="openGridsDialog">
+                      <q-item-section avatar>
+                        <q-icon name="view_module" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>Сітка</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                    <q-item clickable v-close-popup @click.native="openExportDialog">
+                      <q-item-section avatar>
+                        <q-icon name="file_download" />
+                      </q-item-section>
+                      <q-item-section>
+                        <q-item-label>Експорт</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-menu>
+              </q-btn>
+            </div>
+
+            <div class="col-xs-12 col-sm-6" :class="{'text-right': !$q.screen.lt.sm, 'text-center': $q.screen.lt.sm}">
+              <template v-if="$refs.table && props.pagination.rowsNumber">
+                <span class="q-table__bottom-item">{{ $q.lang.table.pagination($refs.table.firstRowIndex + 1, Math.min(props.pagination.page*props.pagination.rowsPerPage, props.pagination.rowsNumber), props.pagination.rowsNumber) }}</span>
+                <q-btn :color="$refs.table.color" round icon="first_page" dense flat :disable="props.isFirstPage" @click="$refs.table.setPagination({page: 1})" />
+                <q-btn :color="$refs.table.color" round icon="chevron_left" dense flat :disable="props.isFirstPage" @click="props.prevPage" />
+                <q-btn :color="$refs.table.color" round icon="chevron_right" dense flat :disable="props.isLastPage" @click="props.nextPage" />
+                <q-btn class="on-left" :color="$refs.table.color" round icon="last_page" dense flat :disable="props.isLastPage" @click="$refs.table.setPagination({page: props.pagesNumber})" />
+              </template>
+              <template v-else>
+                <q-icon :name="$q.iconSet.table.warning" size="sm" class="q-mr-sm"/>
+                {{ quickSearch ? $q.lang.table.noResults: loading ? $q.lang.table.loading : $q.lang.table.noData }}
+              </template>
+            </div>
           </div>
         </q-slide-transition>
 
